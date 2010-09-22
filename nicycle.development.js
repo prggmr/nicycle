@@ -1,5 +1,5 @@
 /*!
- * nicycle Image Slideshow v0.0.0
+ * nicycle Image Slideshow v1.0.0
  * http://www.nwhiting.com/
  *
  * Copyright 2010, Nickolas Whiting
@@ -35,7 +35,7 @@ $.nicycle = function(settings){
                     var topPX  = Math.round(i*box.height);
                     var src  = image.attr('src');
                     var leftPX = Math.round(b*box.width);
-                    html.push('<div style="position: absolute; top: '+topPX+'px; left: '+leftPX+'px; height: '+box.height+'px; width: '+box.width+'px; background: url('+src+') no-repeat -'+leftPX+'px -'+Math.round(topPX)+'px"></div>');
+                    html.push('<div class="nicycle-slide" style="position: absolute; top: '+topPX+'px; left: '+leftPX+'px; height: '+box.height+'px; width: '+box.width+'px; background: url('+src+') no-repeat -'+leftPX+'px -'+Math.round(topPX)+'px"></div>');
                 }
             }
             slide.append(html.join(''));
@@ -89,7 +89,7 @@ $.nicycle = function(settings){
             // set element ontop of the current slide
             b.css('z-index', parseFloat(a.css('z-index')) + 1);
             itemHeight = b.attr('nicycle-block-height');
-            slides = $('div', b);
+            slides = $('div.nicycle-slide', b);
             slides.each(function(){
                 $(this).css({
                     'opacity': 0.0,
@@ -119,7 +119,7 @@ $.nicycle = function(settings){
             b.css('z-index', parseFloat(a.css('z-index')) + 1);
             itemWidth = b.attr('nicycle-block-width');
             itemHeight = b.attr('nicycle-block-height');
-            slides = $('div', b);
+            slides = $('div.nicycle-slide', b);
             slides.each(function(){
                 $(this).css({
                     'opacity': 0.0,
@@ -149,7 +149,7 @@ $.nicycle = function(settings){
             });
             itemWidth = b.attr('nicycle-block-width');
             itemHeight = b.attr('nicycle-block-height');
-            slides = $('div', b);
+            slides = $('div.nicycle-slide', b);
             slides.each(function(){
                 $(this).css({
                     'opacity': 1,
@@ -192,62 +192,45 @@ $.nicycle = function(settings){
             }, $.nicycle.config.animSpeed);
             $.nicycle.events.internal.aftereffect();
         },
-        'snakeMidCrossFade': function(a,b){
+        'snakeMidFade': function(a,b){
             timeBuff = 50;
             $.nicycle.events.internal.beforeeffect();
-            bzindex = parseFloat(a.css('z-index')) - 1;
+            bzindex = parseFloat(a.css('z-index')) + 1;
             itemWidth = b.attr('nicycle-block-width');
             itemHeight = b.attr('nicycle-block-height');
+            slides = $('div.nicycle-slide', b);
+            slides.each(function(){
+                $(this).css({
+                    width: itemWidth,
+                    height: itemHeight,
+                    opacity: 0.0
+                });
+            })
             b.css({
                 'display': 'block',
-                'opacity': 0.0
+                'opacity': 1.0,
+                'z-index': bzindex
             });
-            slides = $('div', b);
-            var secondHalf = new Array();
+            var slideArray = new Array();
             slides.each(function(){
-                secondHalf.push($(this));
+                slideArray.push($(this));
             });
-            oldslides = $('div', a);
-            var firstHalf  = new Array();
-            oldslides.each(function(){
-                firstHalf.push($(this));
-            });
-            firstLength  = Math.round(firstHalf.length / 2);
-            secondLength = Math.round(secondHalf.length / 2);
-            
-            for (a=0;a!=secondLength;a++) {
-                secondHalf[a].css({
-                    'z-index': bzindex,
-                    'height' : itemHeight,
-                    'width'  : itemWidth,
-                    'opacity': 1.0
-                });
-            }
-            for (a=(secondHalf.length-1);a!=secondLength;a--) {
-                var item = secondHalf[i];
-                var itemwidth = itemWidth;
-                secondHalf[a].css({
-                    'z-index': bzindex + 2,
-                    'height' : itemHeight,
-                    'width'  : 0,
-                    'opacity': 0.0
-                });
+            secondLength = Math.round(slideArray.length / 2);
+            var animation = function(i,e, timeBuff) {
                 setTimeout(function(){
-                    item.animate({opacity: 1, width: itemwidth}, $.nicycle.config.animSpeed);
+                    console.log(e);
+                    slideArray[i].animate({opacity: 1.0}, $.nicycle.config.animSpeed);
+                    slideArray[e].animate({opacity: 1.0}, $.nicycle.config.animSpeed);
                 }, (100 + timeBuff));
-                timeBuff += 25;
             }
-            for (var i=0;i!=firstLength;i++) {
-                var item = firstHalf[i];
-                setTimeout(function(){
-                    item.animate({opacity: 0, width: 0}, $.nicycle.config.animSpeed);
-                }, (100 + timeBuff));
-                timeBuff += 25;
+            for (d=0;d!=secondLength+1;d++) {
+                animation(d, (slideArray.length - 1) - d, timeBuff);
+                timeBuff += 50;
             }
             $.nicycle.events.internal.aftereffect();
         },
         'random': function(a,b){
-            var effects = new Array('downfadein', 'crossfadein', 'fadeOut', 'fadeIn');
+            var effects = new Array('downfadein', 'crossfadein', 'fadeOut', 'fadeIn', 'snakeMidFade');
             effect = Math.floor(Math.random() * effects.length);
             $.nicycle.effects[effects[effect]](a,b);
         }
@@ -273,8 +256,8 @@ $.nicycle = function(settings){
             //console.log(img);
             if (!img) {} else {
                 
-                var imageHeight = parseFloat(img.width());
-                var imageWidth  = parseFloat(img.height());
+                var imageHeight = parseFloat(img.height());
+                var imageWidth  = parseFloat(img.width());
                 
                 // no image laoded
                 if (imageHeight == 0 && imageWidth == 0) {
@@ -282,12 +265,12 @@ $.nicycle = function(settings){
                 } else {
                     
                     var boxes = {
-                        height: typeof $.nicycle.config.boxHeight == 'function'  ? $.nicycle.config.boxHeight(img)  : $.nicycle.config.boxHeight,
-                        width : typeof $.nicycle.config.boxWidth  == 'function'  ? $.nicycle.config.boxWidth(img)   : $.nicycle.config.boxWidth
+                        height: parseFloat(typeof $.nicycle.config.boxHeight == 'function'  ? $.nicycle.config.boxHeight(img)  : $.nicycle.config.boxHeight),
+                        width : parseFloat(typeof $.nicycle.config.boxWidth  == 'function'  ? $.nicycle.config.boxWidth(img)   : $.nicycle.config.boxWidth)
                     }
                     
-                    var boxesWidth  = Math.round(parseFloat(Math.round(imageHeight) / parseFloat(boxes.width)));
-                    var boxesHeight = Math.round(parseFloat(Math.round(imageWidth) / parseFloat(boxes.height)));
+                    var boxesWidth  = Math.round(parseFloat(Math.round(imageWidth - boxes.width) / boxes.width));
+                    var boxesHeight = Math.round(parseFloat(Math.round(imageHeight) / boxes.height));
                     
                     var thisRand = $.nicycle.random();
                     $(this).attr('nicycle', thisRand);
