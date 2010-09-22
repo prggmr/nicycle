@@ -1,3 +1,13 @@
+/*!
+ * nicycle Image Slideshow v0.0.0
+ * http://www.nwhiting.com/
+ *
+ * Copyright 2010, Nickolas Whiting
+ * Licensed under the Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0.html
+ *
+ * Date: Wen Sep 22 2010
+ */
 (function($){
 $.nicycle = function(settings){
     
@@ -13,7 +23,23 @@ $.nicycle = function(settings){
         mousePause: true, // Pause any animations on mouseover
         cycle     : true, // Cycle the slideshow at a set interval
         cycTimeout: 7500,  // Timeout for the cycle
-        zindex    : 5000
+        zindex    : 5000,
+        imagefail : function(slide) { // failed to load the src of an image
+            slide.remove();
+        },
+        generateBoxes: function(cols, rows, box, slide, image) {
+            image.css('display', 'none');
+            var html = new Array();
+            for (var i=0;i!=cols;i++) {
+                for (var b=0;b!=rows + 1;b++) {
+                    var topPX  = Math.round(i*box.height);
+                    var src  = image.attr('src');
+                    var leftPX = Math.round(b*box.width);
+                    html.push('<div style="position: absolute; top: '+topPX+'px; left: '+leftPX+'px; height: '+box.height+'px; width: '+box.width+'px; background: url('+src+') no-repeat -'+leftPX+'px -'+Math.round(topPX)+'px"></div>');
+                }
+            }
+            slide.append(html.join(''));
+        }
     }
     
     $.nicycle.currentSlide   = false;
@@ -106,9 +132,9 @@ $.nicycle = function(settings){
                 var item = $(this);
                 var itemwidth = itemWidth;
                 setTimeout(function(){
-                    item.animate({opacity: 1, width: itemwidth}, $.nicycle.config.animSpeed - 150);
-                }, (85 + timeBuff));
-                timeBuff += 20;
+                    item.animate({opacity: 1, width: itemwidth}, $.nicycle.config.animSpeed);
+                }, (100 + timeBuff));
+                timeBuff += 50;
             });
             $.nicycle.events.internal.aftereffect();
         },
@@ -243,50 +269,44 @@ $.nicycle = function(settings){
         var nicycleid = new Array();
         
         $.nicycle.config.slideshow.each(function(){
-            var img = $('img', this);
+            var img = $(this).find('img:first-child');
+            //console.log(img);
             if (!img) {} else {
                 
-                var boxes = {
-                    height: typeof $.nicycle.config.boxHeight == 'function'  ? $.nicycle.config.boxHeight(img)  : $.nicycle.config.boxHeight,
-                    width : typeof $.nicycle.config.boxWidth  == 'function'  ? $.nicycle.config.boxWidth(img)   : $.nicycle.config.boxWidth
-                }
+                var imageHeight = parseFloat(img.width());
+                var imageWidth  = parseFloat(img.height());
                 
-                var boxesWidth  = Math.round(parseFloat(img.width()) / parseFloat(boxes.width));
-                var boxesHeight = Math.round(parseFloat(img.height()) / parseFloat(boxes.height));
-                // generate the boxes in going by col -> row
-                //$(this).html('');
-                var thisRand = $.nicycle.random();
-                $(this).attr('nicycle', thisRand);
-                $(this).attr('ref', thisRand);
-                $(this).attr('nicycle-status', 'hidden');
-                $(this).attr('nicycle-height', img.height());
-                $(this).attr('nicycle-width', img.width());
-                $(this).attr('nicycle-block-height', boxes.height);
-                $(this).attr('nicycle-block-width', boxes.width);
-                
-                nicycleid.push(thisRand);
-                
-                img.css('display', 'none');
-                
-                for (var i=0;i!=boxesHeight;i++) {
-                    for (var b=0;b!=boxesWidth + 1;b++) {
-                        var topPX  = Math.round(i*boxes.height);
-                        var src  = img.attr('src');
-                        var leftPX = Math.round(b*boxes.width);
-                        html.push('<div style="position: absolute; top: '+topPX+'px; left: '+leftPX+'px; height: '+boxes.height+'px; width: '+boxes.width+'px; background: url('+src+') no-repeat -'+leftPX+'px -'+Math.round(topPX)+'px"></div>');
+                // no image laoded
+                if (imageHeight == 0 && imageWidth == 0) {
+                    $.nicycle.config.imagefail($(this));
+                } else {
+                    
+                    var boxes = {
+                        height: typeof $.nicycle.config.boxHeight == 'function'  ? $.nicycle.config.boxHeight(img)  : $.nicycle.config.boxHeight,
+                        width : typeof $.nicycle.config.boxWidth  == 'function'  ? $.nicycle.config.boxWidth(img)   : $.nicycle.config.boxWidth
                     }
-                }
-                
-                $(this).html(html.join(''));
-                if ($(this).html() == '') {
-                    img.css('display', 'block');
-                    $(this).html(img);
-                }
-                
-                if ($.nicycle.currentSlide == false) {
-                    $.nicycle.currentSlide = $(this);
-                    $(this).css('z-index', $.nicycle.config.zindex);
-                    $(this).attr('nicycle-status', 'visible');
+                    
+                    var boxesWidth  = Math.round(parseFloat(Math.round(imageHeight) / parseFloat(boxes.width)));
+                    var boxesHeight = Math.round(parseFloat(Math.round(imageWidth) / parseFloat(boxes.height)));
+                    
+                    var thisRand = $.nicycle.random();
+                    $(this).attr('nicycle', thisRand);
+                    $(this).attr('ref', thisRand);
+                    $(this).attr('nicycle-status', 'hidden');
+                    $(this).attr('nicycle-height', imageHeight);
+                    $(this).attr('nicycle-width', imageWidth);
+                    $(this).attr('nicycle-block-height', boxes.height);
+                    $(this).attr('nicycle-block-width', boxes.width);
+                    
+                    nicycleid.push(thisRand);
+                    
+                    $.nicycle.config.generateBoxes(boxesHeight, boxesWidth, boxes, $(this), img);
+                    
+                    if ($.nicycle.currentSlide == false) {
+                        $.nicycle.currentSlide = $(this);
+                        $(this).css('z-index', $.nicycle.config.zindex);
+                        $(this).attr('nicycle-status', 'visible');
+                    }
                 }
             }
         });
@@ -331,8 +351,8 @@ $.nicycle = function(settings){
         if ($.nicycle.config.cycle) {
             $.nicycle.cycle();
         }
-        
-        if (typeof $.nicycle.events.beforeLoad == 'function') {
+        // trigger the after load effect
+        if (typeof $.nicycle.events.afterLoad == 'function') {
             $.nicycle.events.afterLoad($.nicycle.config.slideshow, $.nicycle.config.navigation);
         }
     }
