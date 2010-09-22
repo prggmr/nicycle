@@ -1,0 +1,75 @@
+/*!
+ * nicycle Image Slideshow v0.0.0
+ * http://www.nwhiting.com/
+ *
+ * Copyright 2010, Nickolas Whiting
+ * Licensed under the Apache License, Version 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0.html
+ *
+ * Date: Wen Sep 22 2010
+ */
+body,html {
+    background: #2D2D33;
+    color: #C1C1CC;
+    font-size: 21px;
+    font-weight: bold;
+    line-height: 1.5em;
+    letter-spacing: -1px;
+    font-family: Arial;
+}
+
+div#body {
+    width: 960px;
+    margin: 25px auto;
+}
+
+h1 {
+    font-size: 45px;
+    width: 100%;
+    margin: 25px 0 0;
+    text-align: center;
+}
+
+h2 {
+    font-size: 25px;
+    color: #DDDDDD;
+    font-weight: normal;
+    text-align: center;
+    text-transform: lowercase;
+    margin-top: 10px;
+}
+
+h3 {
+    font-size: 32px;
+    text-align: center;
+    margin: 25px 0px 0px;
+}
+
+p {
+    margin: 12px 0;
+    color: #DDDDDD;
+    text-align: center;
+}
+
+#slide_container {
+    width: 800px;
+    background: #F0F0F0;
+    border: 1px solid #CCCCCC;
+    padding: 3px;
+    margin: 0 auto;
+    position: relative;
+}
+
+#slide_container ul#slideshow { margin: 0; list-style: none; width: 625px; height: 250px; border: 1px solid #ADADAD; padding: 0; position: relative; }
+#slide_container ul#slideshow li { position: absolute; margin: 0; padding: 0; }
+#slide_container ul#navigation { position: absolute; right: 11px; width: 165px; top: 2px; list-style: none; margin: 0; padding: 0; }
+#slide_container ul#navigation li { height: 55px; border-bottom: 1px solid #D3D3D3; clear: both; position: relative;}
+#slide_container ul#navigation li:hover { cursor: pointer; }
+#slide_container ul#navigation li:hover, #slide_container ul#navigation li.active { background: #E2E2E2; }
+#slide_container ul#navigation li img { position: absolute; top: 5px; left: 5px; border: 1px solid #ADADAD; height: 45px; width: 45px; }
+#slide_container ul#navigation li span {  color:#020202;
+font-size:14px;
+left:60px;
+line-height:21px;
+position:absolute;
+top:6px; }

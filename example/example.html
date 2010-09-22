@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>nicyle Imageslideshow Example</title>
+    <link rel="stylesheet" href="example.css" />
+    <script type="text/javascript" src="jquery.1.4.2.min.js"></script>
+    <script type="text/javascript" src="../nicycle.development.js"></script>
+    <script type="text/javascript">
+        $().ready(function(){
+            $.nicycle({
+                slideshow : $('ul#slideshow > li'), // Our slideshow any container that has children and contains an image works!
+                navigation: $('ul#navigation > li'), // Our navigation same logic applies as the slideshow
+                effect    : 'random', // Random effect!
+                animSpeed : 650, // Amount of time spent on each animation
+                cycle: false, // Turn off the auto cycle,
+                boxHeight: 45, // Height of a box
+                boxWidth : 45, // Width of a box
+                effect   : 'snakeMidFade'
+            });
+        });
+    </script>
+</head>
+<body>
+    <div id="body">
+        <h1>
+            nicycle jQuery Image Slideshow
+        </h1>
+        <h2>
+            written by Nickolas Whiting
+        </h2>
+        <div id="slide_container">
+            <ul id="slideshow">
+                <li>
+                    <img src="images/1.jpg" />
+                </li>
+                <li>
+                    <img src="images/4.jpg" />
+                </li>
+                <li>
+                    <img src="images/5.jpg" />
+                </li>
+                <li>
+                    <img src="images/6.jpg" />
+                </li>
+            </ul>
+            <ul id="navigation">
+                <li>
+                    <img src="images/1_small.jpg" />
+                    <span>onsectetur adipiscing elit</span>
+                </li>
+                <li>
+                    <img src="images/4_small.jpg" />
+                    <span>onsectetur adipiscing elit</span>
+                </li>
+                <li>
+                    <img src="images/5_small.jpg" />
+                    <span>onsectetur adipiscing elit</span>
+                </li>
+                <li>
+                    <img src="images/6_small.jpg" />
+                    <span>onsectetur adipiscing elit</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
