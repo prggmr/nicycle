@@ -218,7 +218,6 @@ $.nicycle = function(settings){
             secondLength = Math.round(slideArray.length / 2);
             var animation = function(i,e, timeBuff) {
                 setTimeout(function(){
-                    console.log(e);
                     slideArray[i].animate({opacity: 1.0}, $.nicycle.config.animSpeed);
                     slideArray[e].animate({opacity: 1.0}, $.nicycle.config.animSpeed);
                 }, (100 + timeBuff));
@@ -229,8 +228,91 @@ $.nicycle = function(settings){
             }
             $.nicycle.events.internal.aftereffect();
         },
+        'snakeMidFadeRev': function(a,b){
+            timeBuff = 50;
+            $.nicycle.events.internal.beforeeffect();
+            bzindex = parseFloat(a.css('z-index')) + 1;
+            itemWidth = b.attr('nicycle-block-width');
+            itemHeight = b.attr('nicycle-block-height');
+            slides = $('div.nicycle-slide', b);
+            slides.each(function(){
+                $(this).css({
+                    width: itemWidth,
+                    height: itemHeight,
+                    opacity: 0.0
+                });
+            })
+            b.css({
+                'display': 'block',
+                'opacity': 1.0,
+                'z-index': bzindex
+            });
+            var slideArray = new Array();
+            slides.each(function(){
+                slideArray.push($(this));
+            });
+            secondLength = Math.round(slideArray.length / 2);
+            var animation = function(i,e, timeBuff) {
+                setTimeout(function(){
+                    slideArray[i].animate({opacity: 1.0}, $.nicycle.config.animSpeed);
+                    slideArray[e].animate({opacity: 1.0}, $.nicycle.config.animSpeed);
+                }, (100 + timeBuff));
+            }
+            for (d=secondLength;d!=0;d--) {
+                animation(d - 1, (slideArray.length - d), timeBuff);
+                timeBuff += 50;
+            }
+            $.nicycle.events.internal.aftereffect();
+        },
+        'fadeInRandom': function(a, b) {
+            timeBuff = 50;
+            $.nicycle.events.internal.beforeeffect();
+            bzindex = parseFloat(a.css('z-index')) + 1;
+            itemWidth = b.attr('nicycle-block-width');
+            itemHeight = b.attr('nicycle-block-height');
+            slides = $('div.nicycle-slide', b);
+            slides.each(function(){
+                $(this).css({
+                    width: itemWidth,
+                    height: itemHeight,
+                    opacity: 0.0
+                });
+            })
+            b.css({
+                'display': 'block',
+                'opacity': 1.0,
+                'z-index': bzindex
+            });
+            var slideArray = new Array();
+            slides.each(function(){
+                slideArray.push($(this));
+            });
+            var animation = function(i, timeBuff) {
+                setTimeout(function(){
+                    slideArray[i].animate({opacity: 1.0}, $.nicycle.config.animSpeed);
+                }, (100 + timeBuff));
+            }
+            var randomize = function ( myArray ) {
+                var i = myArray.length;
+                if ( i == 0 ) return false;
+                i -= 1;
+                while ( --i ) {
+                    var j = Math.floor( Math.random() * ( i + 1 ) );
+                    var tempi = myArray[i];
+                    var tempj = myArray[j];
+                    myArray[i] = tempj;
+                    myArray[j] = tempi;
+                }
+            }
+            randomize(slideArray);
+            for (d=0;d!=slideArray.length;d++) {
+                animation(d, timeBuff);
+                timeBuff += 10;
+            }
+            $.nicycle.events.internal.aftereffect();
+        },
         'random': function(a,b){
-            var effects = new Array('downfadein', 'crossfadein', 'fadeOut', 'fadeIn', 'snakeMidFade');
+            var effects = new Array('downfadein', 'crossfadein', 'fadeOut', 'fadeIn', 'snakeMidFade', 'snakeMidFadeRev', 'fadeInRandom');
             effect = Math.floor(Math.random() * effects.length);
             $.nicycle.effects[effects[effect]](a,b);
         }
